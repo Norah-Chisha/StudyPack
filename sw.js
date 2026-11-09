@@ -1,4 +1,4 @@
-const CACHE = "studypack-v2";
+const CACHE = "studypack-v3";
 const FILES = [
   "./", "./index.html", "./style.css", "./app.js",
   "./lib/pdf.min.js", "./lib/pdf.worker.min.js"

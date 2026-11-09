@@ -31,6 +31,8 @@ const extractStatus = document.getElementById("extractStatus");
 const notesPreview = document.getElementById("notesPreview");
 
 let currentPages = []; // later phases will use this: [{ page: 1, text: "..." }, ...]
+let pdfJoinedText = "";
+let currentChunks = [];
 
 document.getElementById("uploadBtn").addEventListener("click", () => fileInput.click());
 
@@ -68,7 +70,8 @@ fileInput.addEventListener("change", async () => {
     const result = await extractPdf(file);
     currentPages = result.pages;
 
-    const allText = result.pages.map((p) => p.text).join("\n\n");
+    const allText = result.pages.map((p) => p.text).filter((t) => t.length > 0).join("\n\n");
+    pdfJoinedText = allText;
     notesBox.value = allText;
 
     let message = "Read " + result.pages.length + " pages, " + allText.length + " characters.";
@@ -83,4 +86,77 @@ fileInput.addEventListener("change", async () => {
     extractStatus.textContent = "Could not read this PDF. It may be password-protected or damaged.";
   }
   fileInput.value = "";
+});
+
+// ---------- Topic splitting ----------
+const topicList = document.getElementById("topicList");
+
+// Cut very long text into pieces no longer than maxChars, at a space if possible
+function splitLong(text, maxChars) {
+  const parts = [];
+  let rest = text;
+  while (rest.length > maxChars) {
+    let cut = rest.lastIndexOf(" ", maxChars);
+    if (cut < maxChars / 2) cut = maxChars;
+    parts.push(rest.slice(0, cut).trim());
+    rest = rest.slice(cut).trim();
+  }
+  if (rest) parts.push(rest);
+  return parts;
+}
+
+// Group pages into chunks of about maxChars, remembering the page numbers
+function makeChunks(pages, maxChars) {
+  const pieces = [];
+  pages.forEach((p) => {
+    splitLong(p.text, maxChars).forEach((t) => pieces.push({ page: p.page, text: t }));
+  });
+
+  const chunks = [];
+  let cur = { pages: [], text: "" };
+  pieces.forEach((p) => {
+    if (cur.text.length > 0 && cur.text.length + p.text.length > maxChars) {
+      chunks.push(cur);
+      cur = { pages: [], text: "" };
+    }
+    if (p.page && !cur.pages.includes(p.page)) cur.pages.push(p.page);
+    cur.text += (cur.text ? "\n\n" : "") + p.text;
+  });
+  if (cur.text) chunks.push(cur);
+  return chunks;
+}
+
+// Use real page numbers if the box still holds the PDF text; otherwise treat it as pasted text
+function getPagesForSplitting() {
+  const text = notesBox.value.trim();
+  if (text.length === 0) return [];
+  if (currentPages.length > 0 && text === pdfJoinedText.trim()) {
+    return currentPages.filter((p) => p.text.length > 0);
+  }
+  return text.split(/\n\s*\n/)
+    .map((t) => ({ page: null, text: t.trim() }))
+    .filter((p) => p.text.length > 0);
+}
+
+document.getElementById("splitBtn").addEventListener("click", () => {
+  const chunks = makeChunks(getPagesForSplitting(), 3000);
+  topicList.textContent = "";
+
+  if (chunks.length === 0) {
+    extractStatus.textContent = "Nothing to split. Upload a PDF or paste notes first.";
+    return;
+  }
+
+  chunks.forEach((c, i) => {
+    const li = document.createElement("li");
+    let label = "";
+    if (c.pages.length > 0) {
+      label = " (pages " + c.pages[0] + (c.pages.length > 1 ? "-" + c.pages[c.pages.length - 1] : "") + ")";
+    }
+    li.textContent = "Topic " + (i + 1) + label + ": " + c.text.length + " characters";
+    topicList.appendChild(li);
+  });
+
+  currentChunks = chunks;
+  extractStatus.textContent = chunks.length + " topics ready.";
 });

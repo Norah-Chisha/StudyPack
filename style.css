@@ -84,3 +84,6 @@ textarea {
   background: var(--card); border-radius: var(--radius); padding: 14px;
   font-size: 13px; color: var(--muted);
 }
+
+.topic-list { padding-left: 22px; color: var(--muted); }
+.topic-list li { margin: 6px 0; }
