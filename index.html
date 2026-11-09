@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#120b0a">
+  <title>StudyPack</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+
+    <header class="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="About and limits">&#9776;</button>
+      <span class="pill" id="netStatus">Checking...</span>
+    </header>
+
+    <h1>Study anywhere,<br>even offline</h1>
+    <p class="subtitle">Turn your lecture notes into a study pack you can use without internet.</p>
+
+    <section class="hero">
+      <h2>Create a Study Pack</h2>
+      <p>Upload a text-based PDF or paste your notes.</p>
+      <div class="actions">
+        <button class="btn primary" id="uploadBtn">Upload PDF</button>
+        <button class="btn ghost" id="pasteBtn">Paste text</button>
+      </div>
+    </section>
+
+    <section class="tiles">
+      <button class="tile" id="myPacksBtn">
+        <span class="tile-title">My Packs</span>
+        <span class="tile-sub">Study what you saved</span>
+      </button>
+      <button class="tile" id="importBtn">
+        <span class="tile-title">Import Pack</span>
+        <span class="tile-sub">From a classmate</span>
+      </button>
+    </section>
+
+    <h3>Recent Packs</h3>
+    <ul class="pack-list" id="packList">
+      <li class="empty">No packs yet. Create or import one.</li>
+    </ul>
+
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
