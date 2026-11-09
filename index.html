@@ -38,12 +38,22 @@
       </button>
     </section>
 
+        <input type="file" id="fileInput" accept="application/pdf" hidden>
+
+    <section class="create" id="createView" hidden>
+      <h3>Your notes</h3>
+      <textarea id="notesBox" rows="8" placeholder="Paste your notes here, or upload a PDF above."></textarea>
+      <p class="status-line" id="extractStatus"></p>
+      <pre class="preview" id="notesPreview"></pre>
+    </section>
+    
     <h3>Recent Packs</h3>
     <ul class="pack-list" id="packList">
       <li class="empty">No packs yet. Create or import one.</li>
     </ul>
 
   </main>
-  <script src="app.js"></script>
+    <script src="lib/pdf.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

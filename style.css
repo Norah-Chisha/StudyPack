@@ -70,3 +70,17 @@ h3 { margin: 28px 0 10px; font-size: 18px; font-weight: 500; }
   background: var(--card); border-radius: var(--radius); padding: 16px;
 }
 .empty { color: var(--muted); }
+
+[hidden] { display: none !important; }
+
+textarea {
+  width: 100%; background: var(--card); color: var(--text);
+  border: 1px solid #3a2a25; border-radius: var(--radius);
+  padding: 14px; font: inherit; resize: vertical;
+}
+.status-line { color: var(--muted); font-size: 14px; margin: 8px 0; }
+.preview {
+  white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow: auto;
+  background: var(--card); border-radius: var(--radius); padding: 14px;
+  font-size: 13px; color: var(--muted);
+}

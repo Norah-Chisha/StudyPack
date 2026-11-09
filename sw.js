@@ -1,5 +1,8 @@
-const CACHE = "studypack-v1";
-const FILES = ["./", "./index.html", "./style.css", "./app.js"];
+const CACHE = "studypack-v2";
+const FILES = [
+  "./", "./index.html", "./style.css", "./app.js",
+  "./lib/pdf.min.js", "./lib/pdf.worker.min.js"
+];
 
 // 1. INSTALL: save the app files into the cache
 self.addEventListener("install", (event) => {
