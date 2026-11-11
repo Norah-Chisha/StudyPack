@@ -78,7 +78,7 @@ export default async (req) => {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: "application/json",
-          thinkingConfig: { thinkingLevel: "minimal" },
+          thinkingConfig: { thinkingLevel: "low" },
         },
       }),
       signal: AbortSignal.timeout(20000),
