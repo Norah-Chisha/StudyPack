@@ -70,13 +70,17 @@ export default async (req) => {
 
   let response;
   try {
-    response = await fetch(url, {
+        response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
+        generationConfig: {
+          responseMimeType: "application/json",
+          thinkingConfig: { thinkingLevel: "low" },
+        },
       }),
+      signal: AbortSignal.timeout(20000),
     });
   } catch {
     return Response.json({ error: "Could not reach the AI service" }, { status: 502 });
