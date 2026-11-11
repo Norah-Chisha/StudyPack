@@ -87,3 +87,11 @@ textarea {
 
 .topic-list { padding-left: 22px; color: var(--muted); }
 .topic-list li { margin: 6px 0; }
+
+.field { display: block; margin: 12px 0; color: var(--muted); font-size: 14px; }
+.field input, .field select {
+  display: block; width: 100%; margin-top: 6px; min-height: 44px; padding: 0 12px;
+  background: var(--card); color: var(--text); border: 1px solid #3a2a25;
+  border-radius: 12px; font: inherit;
+}
+.check { display: flex; gap: 10px; align-items: center; margin: 12px 0; color: var(--muted); font-size: 14px; }

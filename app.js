@@ -160,3 +160,217 @@ document.getElementById("splitBtn").addEventListener("click", () => {
   currentChunks = chunks;
   extractStatus.textContent = chunks.length + " topics ready.";
 });
+
+// ---------- Phase 5E: generate a pack ----------
+const generateBtn = document.getElementById("generateBtn");
+const genStatus = document.getElementById("genStatus");
+const packResult = document.getElementById("packResult");
+
+const BATCH_SIZE = 2;   // topics per AI request
+const MAX_TOPICS = 12;  // protects your free quota while testing
+let currentPack = null;
+
+function asText(value, max) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
+
+function normalizeText(s) {
+  return s.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+// The source check: does the quoted passage really appear in the student's notes?
+function verifyExcerpt(excerpt, sourceText) {
+  if (excerpt.length < 10) return false;
+  return normalizeText(sourceText).includes(normalizeText(excerpt));
+}
+
+// Accept either {"topics":[...]} or a bare array
+function parseTopics(text) {
+  if (typeof text !== "string") return null;
+  const cleaned = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+  let data;
+  try { data = JSON.parse(cleaned); } catch (e) { return null; }
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.topics)) return data.topics;
+  return null;
+}
+
+// Check and tidy one topic from the AI. Returns null if it is unusable.
+function cleanTopic(raw, chunk) {
+  if (!raw || typeof raw !== "object") return null;
+  const title = asText(raw.title, 120);
+  const explanation = asText(raw.explanation, 3000);
+  if (!title || !explanation) return null;
+
+  // Coverage: our own minimum rules on top of the AI's rating
+  let coverage = ["full", "partial", "thin"].includes(raw.coverage) ? raw.coverage : "partial";
+  if (chunk.text.length < 400) coverage = "thin";
+  else if (chunk.text.length < 1200 && coverage === "full") coverage = "partial";
+
+  const list = (v) => (Array.isArray(v) ? v : []);
+
+  const gaps = list(raw.gaps).map((g) => asText(g, 200)).filter(Boolean).slice(0, 8);
+
+  const glossary = list(raw.glossary)
+    .map((g) => ({ term: asText(g && g.term, 80), meaning: asText(g && g.meaning, 300) }))
+    .filter((g) => g.term && g.meaning)
+    .slice(0, 10);
+
+  let flashcards = list(raw.flashcards)
+    .map((f) => ({ front: asText(f && f.front, 200), back: asText(f && f.back, 300) }))
+    .filter((f) => f.front && f.back)
+    .slice(0, 10);
+
+  let quiz = list(raw.quiz)
+    .map((q) => ({
+      q: asText(q && q.q, 300),
+      options: list(q && q.options).map((o) => asText(o, 200)).slice(0, 6),
+      answer: q && Number.isInteger(q.answer) ? q.answer : -1,
+      why: asText(q && q.why, 300),
+    }))
+    .filter((q) => q.q && q.options.length >= 2 && q.options.every(Boolean) &&
+                   q.answer >= 0 && q.answer < q.options.length)
+    .slice(0, 6);
+
+  // Thin topics get fewer items, enforced by code
+  if (coverage === "thin") {
+    flashcards = flashcards.slice(0, 3);
+    quiz = quiz.slice(0, 2);
+  }
+
+  const excerpt = asText(raw.source && raw.source.excerpt, 400);
+
+  return {
+    title: title,
+    coverage: coverage,
+    gaps: gaps,
+    explanation: explanation,
+    example: asText(raw.example, 1500),
+    mnemonic: asText(raw.mnemonic, 200),
+    glossary: glossary,
+    flashcards: flashcards,
+    quiz: quiz,
+    background: asText(raw.background, 800),
+    source: { pages: chunk.pages, excerpt: excerpt, verified: verifyExcerpt(excerpt, chunk.text) },
+  };
+}
+
+// Send one batch of topics to your Netlify function
+async function generateBatch(batch, options) {
+  const response = await fetch("/api/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      topics: batch.map((c) => ({ pages: c.pages, text: c.text })),
+      level: options.level,
+      course: options.course,
+      allowBackground: options.allowBackground,
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.reason || data.detail || data.error || "Server error " + response.status);
+  const items = parseTopics(data.text);
+  if (!items) throw new Error("The AI reply was not valid JSON");
+  return items;
+}
+
+function showPackSummary(pack, failedCount) {
+  packResult.textContent = "";
+
+  const heading = document.createElement("h3");
+  heading.textContent = pack.title + " (" + pack.topics.length + " topics)";
+  packResult.appendChild(heading);
+
+  const ul = document.createElement("ul");
+  ul.className = "pack-list";
+  pack.topics.forEach((t) => {
+    const li = document.createElement("li");
+    li.textContent = t.title +
+      "\nNotes coverage: " + t.coverage +
+      " | Source: " + (t.source.verified ? "verified" : "NOT verified") +
+      " | " + t.quiz.length + " questions, " + t.flashcards.length + " flashcards" +
+      (t.gaps.length ? "\nGaps: " + t.gaps.join("; ") : "");
+    li.style.whiteSpace = "pre-line";
+    ul.appendChild(li);
+  });
+  packResult.appendChild(ul);
+
+  if (failedCount > 0) {
+    const note = document.createElement("p");
+    note.className = "status-line";
+    note.textContent = failedCount + " topic(s) could not be generated. You can try again.";
+    packResult.appendChild(note);
+  }
+}
+
+generateBtn.addEventListener("click", async () => {
+  if (!navigator.onLine) {
+    genStatus.textContent = "You are offline. Connect once to generate a pack, then study offline.";
+    return;
+  }
+
+  document.getElementById("splitBtn").click(); // fills currentChunks
+  const chunks = currentChunks.slice(0, MAX_TOPICS);
+  if (chunks.length === 0) {
+    genStatus.textContent = "Add some notes first.";
+    return;
+  }
+
+  const options = {
+    course: document.getElementById("courseInput").value.trim(),
+    level: document.getElementById("levelSelect").value,
+    allowBackground: document.getElementById("bgCheck").checked,
+  };
+
+  generateBtn.disabled = true;
+  packResult.textContent = "";
+  const topics = [];
+  let failed = 0;
+  let lastError = "";
+
+  for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+    const batch = chunks.slice(i, i + BATCH_SIZE);
+    genStatus.textContent = "Generating topics " + (i + 1) + " to " + (i + batch.length) +
+                            " of " + chunks.length + "...";
+
+    let items = null;
+    for (let attempt = 1; attempt <= 2 && !items; attempt++) {
+      try {
+        items = await generateBatch(batch, options);
+      } catch (err) {
+        lastError = err.message;
+      }
+    }
+    if (!items) { failed += batch.length; continue; }
+
+    batch.forEach((chunk, j) => {
+      const raw = items.find((it) => it && it.index === j + 1) || items[j];
+      const topic = cleanTopic(raw, chunk);
+      if (topic) topics.push(topic); else failed += 1;
+    });
+  }
+
+  generateBtn.disabled = false;
+
+  if (topics.length === 0) {
+    genStatus.textContent = "Could not generate a pack. " + lastError;
+    return;
+  }
+
+  topics.forEach((t, i) => { t.id = "t" + (i + 1); });
+
+  currentPack = {
+    format: "studypack",
+    version: 1,
+    title: options.course || "Untitled pack",
+    course: options.course,
+    level: options.level,
+    createdAt: new Date().toISOString().slice(0, 10),
+    includesBackground: options.allowBackground,
+    topics: topics,
+  };
+
+  genStatus.textContent = "Done. " + topics.length + " topics ready.";
+  showPackSummary(currentPack, failed);
+  console.log("currentPack", currentPack);
+});

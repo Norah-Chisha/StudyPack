@@ -47,6 +47,26 @@
       <pre class="preview" id="notesPreview"></pre>
       <button class="btn ghost" id="splitBtn">Split into topics</button>
       <ol class="topic-list" id="topicList"></ol>
+      <label class="field">Course name
+  <input type="text" id="courseInput" maxlength="100" placeholder="e.g. Database Management Systems">
+</label>
+<label class="field">Level
+  <select id="levelSelect">
+    <option>Year 1</option>
+    <option selected>Year 2</option>
+    <option>Year 3</option>
+    <option>Year 4</option>
+    <option>Revision</option>
+  </select>
+</label>
+<label class="check">
+  <input type="checkbox" id="bgCheck"> Add AI background (not from your notes)
+</label>
+<button class="btn primary" id="generateBtn">Generate pack</button>
+<p class="status-line" id="genStatus"></p>
+<div id="packResult"></div>
+
+      
     </section>
     
     <h3>Recent Packs</h3>
