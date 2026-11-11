@@ -68,7 +68,8 @@ export default async (req) => {
 
   const url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent";
 
-  let response;
+    const startedAt = Date.now();
+    let response;
   try {
         response = await fetch(url, {
       method: "POST",
@@ -77,13 +78,20 @@ export default async (req) => {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: "application/json",
-          thinkingConfig: { thinkingLevel: "low" },
+          thinkingConfig: { thinkingLevel: "minimal" },
         },
       }),
       signal: AbortSignal.timeout(20000),
     });
-  } catch {
-    return Response.json({ error: "Could not reach the AI service" }, { status: 502 });
+   } catch (err) {
+    return Response.json(
+      {
+        error: "Could not reach the AI service",
+        reason: err.name + ": " + err.message,
+        waitedMs: Date.now() - startedAt,
+      },
+      { status: 502 }
+    );
   }
 
   const data = await response.json().catch(() => ({}));
