@@ -17,6 +17,8 @@ RULES
 4. Set "coverage": "full" if the notes explain the topic well, "partial" if some key ideas are only mentioned, "thin" if the notes barely explain it.
 5. In "gaps", list ONLY ideas that the notes mention by name but do not explain. Never list topics the notes do not mention. Use an empty list if there are none.
 6. If coverage is "thin": at most 2 quiz questions and 3 flashcards. Never invent content to fill space.
+6b. If coverage is "full" or "partial": write 4 to 6 quiz questions and 5 to 8 flashcards, each testing a different idea from the notes.
+6c. "title" must be a short, specific title (at most 8 words) for that topic's main idea. Do not reuse the course title.
 7. ${backgroundRule}
 8. Use simple, clear English suited to the student's level.
 9. Return ONLY valid JSON with no markdown fences. The top level must be an object, not an array, in exactly this shape:

@@ -8,13 +8,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app">
+<main class="app">
 
-    <header class="topbar">
-      <button class="icon-btn" id="menuBtn" aria-label="About and limits">&#9776;</button>
-      <span class="pill" id="netStatus">Checking...</span>
-    </header>
+  <header class="topbar">
+    <button class="icon-btn" id="menuBtn" aria-label="About and limits">&#9776;</button>
+    <span class="pill" id="netStatus">Checking...</span>
+  </header>
 
+  <input type="file" id="fileInput" accept="application/pdf" hidden>
+  <input type="file" id="importInput" hidden>
+
+  <!-- HOME -->
+  <section id="homeView">
     <h1>Study anywhere,<br>even offline</h1>
     <p class="subtitle">Turn your lecture notes into a study pack you can use without internet.</p>
 
@@ -38,44 +43,86 @@
       </button>
     </section>
 
-        <input type="file" id="fileInput" accept="application/pdf" hidden>
-
-    <section class="create" id="createView" hidden>
-      <h3>Your notes</h3>
-      <textarea id="notesBox" rows="8" placeholder="Paste your notes here, or upload a PDF above."></textarea>
-      <p class="status-line" id="extractStatus"></p>
-      <pre class="preview" id="notesPreview"></pre>
-      <button class="btn ghost" id="splitBtn">Split into topics</button>
-      <ol class="topic-list" id="topicList"></ol>
-      <label class="field">Course name
-  <input type="text" id="courseInput" maxlength="100" placeholder="e.g. Database Management Systems">
-</label>
-<label class="field">Level
-  <select id="levelSelect">
-    <option>Year 1</option>
-    <option selected>Year 2</option>
-    <option>Year 3</option>
-    <option>Year 4</option>
-    <option>Revision</option>
-  </select>
-</label>
-<label class="check">
-  <input type="checkbox" id="bgCheck"> Add AI background (not from your notes)
-</label>
-<button class="btn primary" id="generateBtn">Generate pack</button>
-<p class="status-line" id="genStatus"></p>
-<div id="packResult"></div>
-
-      
-    </section>
-    
     <h3>Recent Packs</h3>
-    <ul class="pack-list" id="packList">
-      <li class="empty">No packs yet. Create or import one.</li>
-    </ul>
+    <ul class="pack-list" id="packList"></ul>
+  </section>
 
-  </main>
-    <script src="lib/pdf.min.js"></script>
-    <script src="app.js"></script>
+  <!-- CREATE -->
+  <section id="createView" hidden>
+    <button class="back" id="backFromCreate">&larr; Back</button>
+    <h2>Your notes</h2>
+    <textarea id="notesBox" rows="10" placeholder="Paste your notes here, or upload a PDF from the Home screen."></textarea>
+    <p class="status-line" id="extractStatus"></p>
+    <button class="btn ghost" id="splitBtn">Split into topics</button>
+    <ol class="topic-list" id="topicList"></ol>
+
+    <label class="field">Course name
+      <input type="text" id="courseInput" maxlength="100" placeholder="e.g. Introduction to AI">
+    </label>
+    <label class="field">Level
+      <select id="levelSelect">
+        <option>Year 1</option>
+        <option selected>Year 2</option>
+        <option>Year 3</option>
+        <option>Year 4</option>
+        <option>Revision</option>
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" id="bgCheck"> Add AI background (not from your notes)
+    </label>
+    <button class="btn primary" id="generateBtn">Generate pack</button>
+    <p class="status-line" id="genStatus"></p>
+  </section>
+
+  <!-- PACK -->
+  <section id="packView" hidden>
+    <button class="back" id="backFromPack">&larr; Home</button>
+    <h2 id="packTitle"></h2>
+    <p class="status-line" id="packMeta"></p>
+    <div class="actions">
+      <button class="btn primary small" id="exportBtn">Share pack</button>
+      <button class="btn ghost small" id="deleteBtn">Delete</button>
+    </div>
+    <h3>Topics</h3>
+    <ul class="pack-list" id="packTopics"></ul>
+  </section>
+
+  <!-- TOPIC -->
+  <section id="topicView" hidden>
+    <button class="back" id="backFromTopic">&larr; Topics</button>
+    <h2 id="topicTitle"></h2>
+    <div id="topicBadges" class="badges"></div>
+    <div class="tabs">
+      <button class="tab active" data-tab="explain">Explain</button>
+      <button class="tab" data-tab="quiz">Quiz</button>
+      <button class="tab" data-tab="cards">Cards</button>
+      <button class="tab" data-tab="source">Source</button>
+    </div>
+    <div id="panel-explain"></div>
+    <div id="panel-quiz" hidden></div>
+    <div id="panel-cards" hidden></div>
+    <div id="panel-source" hidden></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="aboutView" hidden>
+    <button class="back" id="backFromAbout">&larr; Back</button>
+    <h2>About and limits</h2>
+    <p class="body-text">StudyPack turns your own notes into a study pack you can use offline. You connect once to create a pack, then study with no internet.</p>
+    <h4>Please know</h4>
+    <ul class="body-text">
+      <li>Only text-based PDFs can be read. Scanned or image-only pages are skipped.</li>
+      <li>AI can make mistakes. Always check explanations against your lecturer's material.</li>
+      <li>When you create a pack, your notes are sent to an AI service (Google Gemini). Do not include personal information. On the free tier, Google may use submitted content to improve its products.</li>
+      <li>Packs are stored only on this device. Share a pack only if you have the right to share the material it came from.</li>
+      <li>"Source verified" means the quoted passage was found word for word in your notes. It does not prove the whole explanation is correct.</li>
+      <li>This is a prototype. It has not yet been tested with a large group of students.</li>
+    </ul>
+  </section>
+
+</main>
+<script src="lib/pdf.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
