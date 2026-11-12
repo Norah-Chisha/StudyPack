@@ -1,0 +1,53 @@
+Introduction to Artificial Intelligence and Machine Learning - Lecture Notes
+
+1. What is Artificial Intelligence?
+
+Artificial intelligence (AI) is the field of computer science that builds systems able to perform tasks that normally need human intelligence, such as recognising speech, understanding language, making decisions and translating text. AI does not mean a computer thinks like a person. Most AI systems today are narrow AI: they are designed for one specific task, such as recommending videos or detecting fraud in bank transactions. General AI, a system that could learn any task a human can, does not yet exist.
+
+AI includes several areas. Machine learning lets systems learn patterns from data. Natural language processing deals with human language. Computer vision allows computers to interpret images and video. Robotics combines AI with machines that act in the physical world.
+
+2. Machine Learning
+
+Machine learning (ML) is a branch of AI in which a computer learns from examples instead of following rules written by a programmer. In traditional programming, a developer writes rules and the computer applies them to data to produce answers. In machine learning, the developer provides data and the correct answers, and the computer works out the rules by itself. The rules it learns are stored in a model.
+
+There are three main types of machine learning: supervised learning, unsupervised learning and reinforcement learning.
+
+3. Supervised Learning
+
+In supervised learning, the training data is labelled, meaning each example comes with the correct answer. The model learns the relationship between the inputs, called features, and the output, called the label. After training, it can predict the label for new data it has not seen before.
+
+Supervised learning has two main kinds of problems. Classification predicts a category. For example, a spam filter learns from emails labelled "spam" or "not spam" and then classifies new emails. Regression predicts a number. For example, a model can learn from past house sales to predict the price of a house from its size and location.
+
+Data is usually split into a training set and a test set. The model learns from the training set. The test set is kept aside and used afterwards to check how well the model performs on data it has never seen. A common split is 80 percent for training and 20 percent for testing.
+
+4. Unsupervised Learning
+
+In unsupervised learning, the data has no labels. The model looks for structure in the data on its own. The most common task is clustering, which groups similar items together. For example, a shop can cluster customers by their buying habits to find groups with similar interests, without being told in advance what the groups should be.
+
+5. Reinforcement Learning
+
+Reinforcement learning is a third type of machine learning. It is used in areas such as game playing and robotics.
+
+6. Overfitting and Underfitting
+
+A good model must work well on new data, not only on the data it learned from. Overfitting happens when a model learns the training data too closely, including its noise and accidental details, so it performs well in training but poorly on new data. A student who memorises past exam answers without understanding the subject is a useful comparison. Underfitting happens when a model is too simple to capture the pattern in the data, so it performs poorly even on the training set.
+
+Ways to reduce overfitting include using more training data, simplifying the model and stopping training early. Checking performance on the test set shows whether overfitting has occurred: a large gap between training performance and test performance is a warning sign.
+
+7. Evaluating a Model
+
+The simplest measure of a classification model is accuracy, the percentage of predictions that are correct. For example, a model that classifies 90 out of 100 emails correctly has an accuracy of 90 percent. Accuracy can be misleading when one class is much more common than the other. Precision and recall are other measures that are used in such cases.
+
+8. Neural Networks and Deep Learning
+
+A neural network is a model loosely inspired by the brain. It is made of layers of connected units called neurons. Each connection has a weight, which is a number that controls how strongly one neuron influences the next. The network has an input layer that receives the data, one or more hidden layers that process it, and an output layer that gives the result. During training, the weights are adjusted many times to reduce the model's errors.
+
+Deep learning uses neural networks with many hidden layers. It has achieved strong results in image recognition, speech recognition and language translation. Deep learning usually needs large amounts of data and a lot of computing power, which makes it expensive to train.
+
+9. Preparing Data
+
+The quality of a model depends on the quality of its data. Real data often contains missing values, mistakes and duplicates, so it must be cleaned before training. Features may also need to be scaled so that large numbers do not dominate small ones. Data preparation often takes more time than building the model.
+
+10. Ethics in AI
+
+AI systems can cause harm if they are built carelessly. Bias is one risk: if the training data does not fairly represent all groups of people, the model can treat some groups unfairly. For example, a hiring tool trained mostly on past applications from one group may favour that group. Privacy is another concern, because many AI systems are trained on personal data and must protect it. Explainability, the ability to understand why a model made a decision, is also important.
